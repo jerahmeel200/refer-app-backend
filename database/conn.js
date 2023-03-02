@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 const connect = async () => {
   try {
-    const conn = await mongoose.connect(
-      "mongodb+srv://jamico:jamico@cluster0.hyxju.mongodb.net/?retryWrites=true&w=majority"
-    );
+    mongoose.connect = process.env.MONGO_URI;
 
     console.log("mongoDb Connected");
   } catch (error) {
