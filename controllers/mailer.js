@@ -1,8 +1,6 @@
 import nodemailer from "nodemailer";
 import Mailgen from "mailgen";
 
-// import ENV from "../config.js";
-
 /** send mail from real gmail account */
 const registerMail = (req, res) => {
   const { email } = req.body;
