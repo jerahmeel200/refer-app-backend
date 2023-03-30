@@ -31,7 +31,7 @@ export async function verifyUser(req, res, next) {
  */
 export async function register(req, res) {
   try {
-    const { username, password, profile, email } = req.body;
+    const { username, password, email } = req.body;
 
     // check for existing user
     const existUsername = new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ export async function register(req, res) {
               const user = new UserModel({
                 username,
                 password: hashPassword,
-                profile: profile || "",
+                // profile: profile || "",
                 email,
               });
               // return save result as a response
