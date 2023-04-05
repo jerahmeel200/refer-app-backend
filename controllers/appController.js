@@ -96,10 +96,13 @@ export async function register(req, res) {
  }
  */
 export async function login(req, res) {
-  const { username, password } = req.body;
+  const { emailOrUserName, password } = req.body;
+  const searchQuery = {
+    $or: [{ email: emailOrUserName }, { username: emailOrUserName }],
+  };
 
   try {
-    UserModel.findOne({ username })
+    UserModel.findOne(searchQuery)
       .then((user) => {
         bcrypt
           .compare(password, user.password)
@@ -119,7 +122,7 @@ export async function login(req, res) {
 
             return res.status(200).send({
               msg: "Login Successful...!",
-              username: user.username,
+              user,
               token,
             });
           })
