@@ -141,14 +141,15 @@ export async function login(req, res) {
 /** GET: http://localhost:8080/api/user/example*/
 export async function getUser(req, res) {
   const { username } = req.params;
+  console.log("username", username);
 
   try {
     if (!username) return res.status(501).send({ error: "Invalid Username" });
 
     UserModel.findOne({ username }, function (err, user) {
-      if (err) return res.status(500).send({ err });
+      if (err) return res.status(400).send({ err });
       if (!user)
-        return res.status(501).send({ error: "Couldn't Find the User" });
+        return res.status(401).send({ error: "Couldn't Find the User" });
 
       /** remove password from user */
       // mongoose return unnecessary data with object so convert it into json
@@ -157,7 +158,7 @@ export async function getUser(req, res) {
       return res.status(201).send(rest);
     });
   } catch (error) {
-    return res.status(404).send({ error: "Cannot Find User Data" });
+    return res.status(500).send({ error: "Cannot Find User Data" });
   }
 }
 
