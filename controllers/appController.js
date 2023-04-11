@@ -177,10 +177,11 @@ export async function updateUser(req, res) {
   try {
     // const id = req.query.id;
     const { userId } = req.user;
+    console.log(userId, "user id");
 
     if (userId) {
       const body = req.body;
-
+      console.log(body, "body");
       // update the data
       UserModel.updateOne({ _id: userId }, body, function (err, data) {
         if (err) throw err;
