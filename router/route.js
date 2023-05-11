@@ -19,6 +19,7 @@ router
   .get(controller.verifyUser, localVariables, controller.generateOTP); //generate random OTP
 router.route("/verifyOTP").get(controller.verifyUser, controller.verifyOTP); //verify generated OTP
 router.route("/createResetSession").get(controller.createResetSession); //reset all the variebles
+router.route("/verify").get(controller.verify);
 
 // Put Method
 router.route("/updateuser").put(Auth, controller.updateUser); // is use to update the user profile

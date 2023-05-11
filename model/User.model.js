@@ -16,6 +16,8 @@ export const UserSchema = new mongoose.Schema({
     required: [true, "Please provide a unique email"],
     unique: true,
   },
+  verified: { type: Boolean, default: false },
+  emailVerificationCode: String,
   firstName: { type: String },
   lastName: { type: String },
   mobile: { type: String },

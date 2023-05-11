@@ -1,64 +1,49 @@
+// Require nodemailer
 import nodemailer from "nodemailer";
-import Mailgen from "mailgen";
+// Require crypto for generating verification code
+// const crypto = require('crypto');
 
-/** send mail from real gmail account */
-const registerMail = (req, res) => {
-  const { email } = req.body;
-
-  let config = {
+// Set up transport object with Gmail SMTP settings
+const sendMail = (email, code) => {
+  let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD,
-    },
-  };
-
-  let transporter = nodemailer.createTransport(config);
-
-  let MailGenerator = new Mailgen({
-    theme: "default",
-    product: {
-      name: "Mailgen",
-      link: "https://mailgen.js/",
+      user: "jazzkid360@gmail.com",
+      pass: "nvciotnoieqfxhlj",
     },
   });
 
-  let response = {
-    body: {
-      name: "Jamico ",
-      intro: "you otp hs arrived has arrived!",
-      table: {
-        data: [
-          {
-            description: "A Backend application",
-          },
-        ],
-      },
-      outro: "here the otp you ordered",
-    },
-  };
+  // Generate verification code using crypto
+  // const verificationCode = crypto.randomBytes(20).toString('hex');
 
-  let mail = MailGenerator.generate(response);
+  // Store verification code and user email in database
+  // This step will depend on your database implementation
 
-  let message = {
-    from: process.env.EMAIL,
+  // Send verification email to user
+
+  const link = `http://localhost:8080/api/verify?email=${email}&code=${code}`;
+  let mailOptions = {
+    from: "jazzkid360@gmail.com",
     to: email,
-    subject: "Place Order",
-    html: mail,
+    subject: "Verify Your Email Address",
+    html: `<p>Hello,</p>
+           <p>Please click on the following link to verify your email address:</p>
+           <p><a href=${link}>Verify Email Address</a></p>
+           <p>If you did not request this verification, please ignore this email.</p>
+           <p>Thank you,<br>Your Company Name</p>`,
   };
 
-  transporter
-    .sendMail(message)
-    .then(() => {
-      return res.status(201).json({
-        msg: "you should receive an email",
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({ error });
-    });
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
 
-  // res.status(201).json("getBill Successfully...!");
+  // When the user clicks on the link in the email, your server should verify the code
+  // against the one stored in the database, and update the user's email address as verified
+  // This step will depend on your server-side implementation
 };
 
-export default registerMail;
+export default sendMail;

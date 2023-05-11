@@ -2,6 +2,7 @@ import UserModel from "../model/User.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
+import sendMail from "./mailer.js";
 
 // middleware for verifying  user
 export async function verifyUser(req, res, next) {
@@ -34,59 +35,82 @@ export async function register(req, res) {
     const { username, password, email } = req.body;
 
     // check for existing user
-    const existUsername = new Promise((resolve, reject) => {
-      UserModel.findOne({ username }, function (err, user) {
-        if (err) reject(new Error(err));
-        if (user) reject({ error: "Please use unique username" });
+    const userName = await UserModel.findOne({ username });
+    if (userName) {
+      console.log("user here", userName);
+      return res.status(400).send({ error: "Please use unique username" });
+    }
 
-        resolve();
-      });
-    });
     // check for existing email
-    const existEmail = new Promise((resolve, reject) => {
-      UserModel.findOne({ email }, function (err, email) {
-        if (err) reject(new Error(err));
-        if (email) reject({ error: "Please use unique email" });
-
-        resolve();
-      });
-    });
+    const existingEmail = await UserModel.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).send({ error: "Please use unique email" });
+    }
 
     // hash password
-    Promise.all([existUsername, existEmail])
-      .then(() => {
-        if (password) {
-          bcrypt
-            .hash(password, 10)
-            .then((hashPassword) => {
-              const user = new UserModel({
-                username,
-                password: hashPassword,
-                // profile: profile || "",
-                email,
-              });
-              // return save result as a response
-              user
-                .save()
-                .then((result) =>
-                  res.status(201).send({ msg: "User Register sucessfully" })
-                )
-                .catch((error) => res.status(500).send({ error }));
-            })
-            .catch((error) => {
-              return res.status(500).send({
-                error: "Enable to hashed password",
-              });
-            });
-        }
-      })
-      .catch((error) => {
-        return res.status(500).send({ error });
-      });
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const newRandomCode = Math.random();
+
+    const newUser = new UserModel({
+      username,
+      password: hashPassword,
+      email,
+      isVerified: false,
+      emailVerificationCode: newRandomCode,
+    });
+
+    // return save result as a response
+    await newUser.save();
+    sendMail(email, newRandomCode);
+    return res.status(201).send({ msg: "User Register successfully" });
   } catch (error) {
-    res.status(500).send(error);
+    console.error(error);
+    return res.status(500).send({ error });
   }
 }
+
+export async function verify(req, res) {
+  const { code, email } = req.query;
+
+  try {
+    const user = await UserModel.findOne({ email });
+
+    if (user && user.emailVerificationCode === code) {
+      user.verified = true;
+      await user.save();
+      res.json({ message: "success" });
+    } else {
+      res.send("Invalid verification code");
+    }
+  } catch (error) {
+    console.error(error);
+    res.send("An error occurred during verification");
+  }
+}
+
+// export async function verify(req, res) {
+//   const { code, email } = req.query;
+
+//   try {
+//     // Find the user by email
+//     const user = await UserModel.findOne({ email });
+
+//     // Compare the found user's 'emailVerificationCode' with the code from the request query
+//     if (user && user.emailVerificationCode === code) {
+//       // Update the verified status of the user
+//       user.verified = true;
+//       await user.save();
+
+//       res.json({ message: "success" });
+//     } else {
+//       res.send("Invalid verification code");
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.send("An error occurred during verification");
+//   }
+// }
 
 /** POST: http://localhost:8080/api/login 
   * @param : {
