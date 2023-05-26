@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
+const { Schema } = mongoose;
 
 export const UserSchema = new mongoose.Schema({
+  userType: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+
   username: {
     type: String,
     required: [true, "Please provide unique Username"],
@@ -25,6 +32,15 @@ export const UserSchema = new mongoose.Schema({
     accountName: String,
     bankName: String,
     accountNumber: String,
+  },
+
+  referredBy: {
+    type: String,
+    enum: ["user", "admin"],
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
 });
 
