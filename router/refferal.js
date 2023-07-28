@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import * as controller from "../controllers/appController.js";
+import * as controller from "../controllers/auth.js";
 import registerMail from "../controllers/mailer.js";
 import Auth, { localVariables } from "../middleware/auth.js";
 

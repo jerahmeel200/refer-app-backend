@@ -13,6 +13,7 @@ export const UserSchema = new mongoose.Schema({
     required: [true, "Please provide unique Username"],
     unique: [true, "Username Exist"],
   },
+
   password: {
     type: String,
     required: [true, "Please provide a password"],
@@ -44,6 +45,32 @@ export const UserSchema = new mongoose.Schema({
       ref: "User",
     },
   },
+
+  // childrenInsideMyNetwork
+  // max number is 5
+  // the first 5 people that signed up with user's username will join the user network by default
+  // the remaining others will join childrenOutsideMyNetwork
+  // after a person refferal plan is due for withrawal and withdrawal has been done, the childrenInsideMyNetwork
+  // will be reset so that he can start a new plan/refferal network
+  childrenInsideMyNetwork: [
+    {
+      childId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
+
+  // childrenOutsideMyNetwork
+  // no max
+  childrenOutsideMyNetwork: [
+    {
+      childId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
 });
 
 export default mongoose.model.Users || mongoose.model("User", UserSchema);

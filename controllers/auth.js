@@ -89,29 +89,6 @@ export async function verify(req, res) {
   }
 }
 
-// export async function verify(req, res) {
-//   const { code, email } = req.query;
-
-//   try {
-//     // Find the user by email
-//     const user = await UserModel.findOne({ email });
-
-//     // Compare the found user's 'emailVerificationCode' with the code from the request query
-//     if (user && user.emailVerificationCode === code) {
-//       // Update the verified status of the user
-//       user.verified = true;
-//       await user.save();
-
-//       res.json({ message: "success" });
-//     } else {
-//       res.send("Invalid verification code");
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.send("An error occurred during verification");
-//   }
-// }
-
 /** POST: http://localhost:8080/api/login 
   * @param : {
    "username" : "example123",
